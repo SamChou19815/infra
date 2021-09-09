@@ -4173,6 +4173,17 @@ fsevents@^2.3.2:
   languageName: unknown
   linkType: soft
 
+"lib-git@workspace:packages/lib-git":
+  version: 0.0.0-use.local
+  resolution: "lib-git@workspace:packages/lib-git"
+  dependencies:
+    "@types/jest": ^27.0.1
+    "@types/node": ^16.9.0
+    lib-base: "workspace:0.1.0"
+    typescript: ^4.4.2
+  languageName: unknown
+  linkType: soft
+
 "lines-and-columns@npm:^1.1.6":
   version: 1.1.6
   resolution: "lines-and-columns@npm:1.1.6"
