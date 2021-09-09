@@ -1,0 +1,13 @@
+{
+  "name": "lib-base",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "compile": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.1",
+    "@types/node": "^16.9.0",
+    "typescript": "^4.4.2"
+  }
+}

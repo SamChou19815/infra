@@ -1,0 +1,54 @@
+{
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "lint": "eslint . --cache",
+    "format": "prettier --write '**/*.{ts,js,yml}'",
+    "format:check": "prettier --check '**/*.{ts,js,yml}'",
+    "codegen": "yarn workspace @dev-sam/samlang-cli bundle && ./samlang-cli/bin/index.js format",
+    "bundle": "yarn workspaces foreach run bundle",
+    "test": "jest",
+    "test:single": "jest -t",
+    "bump": "yarn up @types/jest @types/node prettier jest husky lint-staged esbuild eslint \"@typescript-eslint/*\" \"eslint-*\"",
+    "import-plugin": "yarn plugin import ./packages/yarn-plugin-monorail/bundles/plugin-monorail.js",
+    "setup-plugin": "yarn workspace yarn-plugin-monorail bundle && yarn import-plugin && yarn"
+  },
+  "devDependencies": {
+    "@dev-sam/eslint-config-common": "workspace:*",
+    "@dev-sam/jest-esbuild-transformer": "workspace:0.4.0",
+    "@types/jest": "^27.0.1",
+    "@types/node": "^16.9.0",
+    "@typescript-eslint/eslint-plugin": "^4.31.0",
+    "@typescript-eslint/parser": "^4.31.0",
+    "esbuild": "^0.12.26",
+    "eslint": "^7.32.0",
+    "eslint-import-resolver-node": "^0.3.6",
+    "eslint-plugin-import": "^2.24.2",
+    "husky": "^7.0.2",
+    "jest": "^27.1.1",
+    "lint-staged": "^11.1.2",
+    "prettier": "^2.4.0",
+    "typescript": "^4.4.2"
+  },
+  "eslintConfig": {
+    "extends": "@dev-sam/common"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "endOfLine": "lf"
+  },
+  "jest": {
+    "transform": {
+      "\\.ts$": "@dev-sam/jest-esbuild-transformer"
+    }
+  },
+  "lint-staged": {
+    "**/*.{ts,yml}": [
+      "yarn prettier --write"
+    ]
+  },
+  "packageManager": "yarn@3.0.2"
+}

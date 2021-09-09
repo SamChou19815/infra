@@ -1,0 +1,43 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '2'
+      - uses: actions/setup-node@v2
+      - name: Yarn Install
+        run: yarn install --immutable
+      - name: Format Check
+        run: yarn format:check
+      - name: Lint
+        run: yarn lint
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '2'
+      - uses: actions/setup-node@v2
+      - name: Yarn Install
+        run: yarn install --immutable
+      - name: Compile
+        run: yarn c
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          cache: 'yarn'
+      - name: Yarn Install
+        run: yarn install --immutable
+      - name: Test
+        run: yarn test
