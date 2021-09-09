@@ -1,0 +1,44 @@
+{
+  "name": "vscode-isl",
+  "version": "0.0.1",
+  "description": "Interactive Smart Log for Git.",
+  "author": "Developer Sam",
+  "license": "AGPL-3.0",
+  "main": "./build/extension.js",
+  "scripts": {
+    "build": "node build.js",
+    "compile": "tsc --noEmit"
+  },
+  "engines": {
+    "vscode": "^1.61.0"
+  },
+  "activationEvents": [
+    "onCommand:dev-sam.vscode-isl.start"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "dev-sam.vscode-isl.start",
+        "title": "Open Interactive SmartLog"
+      }
+    ]
+  },
+  "dependencies": {
+    "@types/node": "^16.11.6",
+    "@types/react": "^17.0.33",
+    "@types/react-dom": "^17.0.10",
+    "@types/react-redux": "^7.1.20",
+    "@types/vscode": "1.61.0",
+    "lib-base": "workspace:0.1.0",
+    "lib-git": "workspace:0.1.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-redux": "^7.2.6",
+    "redux": "^4.1.2"
+  },
+  "devDependencies": {
+    "@yarnpkg/esbuild-plugin-pnp": "^2.0.0",
+    "esbuild": "^0.13.12",
+    "typescript": "^4.4.4"
+  }
+}
