@@ -1,0 +1,16 @@
+{
+  "name": "lib-git",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "compile": "tsc --noEmit"
+  },
+  "dependencies": {
+    "lib-base": "workspace:0.1.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.1",
+    "@types/node": "^16.9.0",
+    "typescript": "^4.4.2"
+  }
+}
