@@ -26,28 +26,23 @@ export async function queryGitLog(limit = 100): Promise<readonly GitLogEntry[]> 
     `--max-count=${limit}`,
     `--format="${format}"`
   );
-  return stdout
-    .trim()
-    .split(EOL_REGEX)
-    .map((it) => {
-      const [hash, parentHash, authorName, authorEmail, commitTimeString, subject] = it
-        .trim()
-        .split(GIT_LOG_SEPARATOR);
-      assert(hash != null);
-      assert(parentHash != null);
-      assert(authorName != null);
-      assert(authorEmail != null);
-      const commitTime = new Date(parseInt(checkNotNull(commitTimeString), 10) * 1000);
-      assert(subject != null);
-      return {
-        hash,
-        parentHash: parentHash || null,
-        authorName,
-        authorEmail,
-        commitTime,
-        subject,
-      };
-    });
+  const lines = stdout.trim().split(EOL_REGEX);
+  return lines.map((it) => {
+    const [hash, parentHash, authorName, authorEmail, commitTimeString, subject] = it
+      .trim()
+      .split(GIT_LOG_SEPARATOR);
+    assert(hash != null && parentHash != null && authorName != null && authorEmail != null);
+    const commitTime = new Date(parseInt(checkNotNull(commitTimeString), 10) * 1000);
+    assert(subject != null);
+    return {
+      hash,
+      parentHash: parentHash || null,
+      authorName,
+      authorEmail,
+      commitTime,
+      subject,
+    };
+  });
 }
 
 export interface GitRef {
