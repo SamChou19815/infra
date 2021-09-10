@@ -28,7 +28,7 @@ export async function queryGitLog(limit = 100): Promise<readonly GitLogEntry[]> 
   );
   return stdout
     .trim()
-    .split('\n')
+    .split(EOL_REGEX)
     .map((it) => {
       const [hash, parentHash, authorName, authorEmail, commitTimeString, subject] = it
         .trim()
@@ -48,4 +48,50 @@ export async function queryGitLog(limit = 100): Promise<readonly GitLogEntry[]> 
         subject,
       };
     });
+}
+
+export interface GitRef {
+  readonly hash: string;
+  readonly name: string;
+}
+
+export interface GitTag extends GitRef {
+  readonly annotated: boolean;
+}
+
+export interface GitRefInfo {
+  readonly headHash: string;
+  readonly heads: readonly GitRef[];
+  readonly tags: readonly GitTag[];
+  readonly remotes: readonly GitRef[];
+}
+
+export async function queryGitRef(): Promise<GitRefInfo> {
+  const { stdout } = await startAsyncProcess('git', 'show-ref', '-d', '--head');
+  const lines = stdout.trim().split(EOL_REGEX);
+  const heads: GitRef[] = [];
+  const tags: GitTag[] = [];
+  const remotes: GitRef[] = [];
+  let headHash: string | undefined;
+
+  lines.forEach((line) => {
+    const parts = line.split(' ');
+    if (line.length < 2) return;
+    const [hash, ref] = parts;
+    assert(hash != null && ref != null);
+
+    if (ref.startsWith('refs/heads/')) {
+      heads.push({ hash, name: ref.substring(11) });
+    } else if (ref.startsWith('refs/tags/')) {
+      const annotated = ref.endsWith('^{}');
+      const name = annotated ? ref.substring(10, ref.length - 3) : ref.substring(10);
+      tags.push({ hash, name, annotated });
+    } else if (ref.startsWith('refs/remotes/')) {
+      if (!ref.endsWith('/HEAD')) remotes.push({ hash, name: ref.substring(13) });
+    } else if (ref === 'HEAD') {
+      headHash = hash;
+    }
+  });
+
+  return { headHash: checkNotNull(headHash), heads, tags, remotes };
 }
