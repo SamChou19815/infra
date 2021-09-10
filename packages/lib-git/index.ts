@@ -54,6 +54,8 @@ export interface GitTag extends GitRef {
   readonly annotated: boolean;
 }
 
+//
+
 export interface GitRefInfo {
   readonly headHash: string;
   readonly heads: readonly GitRef[];
@@ -89,4 +91,45 @@ export async function queryGitRef(): Promise<GitRefInfo> {
   });
 
   return { headHash: checkNotNull(headHash), heads, tags, remotes };
+}
+
+export interface GitStatusInfo {
+  readonly deleted: readonly string[];
+  readonly untracked: readonly string[];
+}
+
+export async function queryGitStatus(): Promise<GitStatusInfo> {
+  const { stdout } = await startAsyncProcess(
+    'git',
+    'status',
+    '-s',
+    '--untracked-files=all',
+    '--porcelain',
+    '-z'
+  );
+  const output = stdout.split('\0');
+  let i = 0;
+  let path = '',
+    c1 = '',
+    c2 = '';
+  const deleted: string[] = [];
+  const untracked: string[] = [];
+  while (i < output.length && output[i] !== '') {
+    const entry = checkNotNull(output[i]);
+    console.log(entry);
+    if (entry.length < 4) break;
+    path = entry.substring(3);
+    c1 = entry.substring(0, 1);
+    c2 = entry.substring(1, 2);
+    if (c1 === 'D' || c2 === 'D') deleted.push(path);
+    else if (c1 === '?' || c2 === '?') untracked.push(path);
+
+    if (c1 === 'R' || c2 === 'R' || c1 === 'C' || c2 === 'C') {
+      // Renames or copies
+      i += 2;
+    } else {
+      i += 1;
+    }
+  }
+  return { deleted, untracked };
 }
