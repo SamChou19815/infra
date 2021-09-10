@@ -116,7 +116,6 @@ export async function queryGitStatus(): Promise<GitStatusInfo> {
   const untracked: string[] = [];
   while (i < output.length && output[i] !== '') {
     const entry = checkNotNull(output[i]);
-    console.log(entry);
     if (entry.length < 4) break;
     path = entry.substring(3);
     c1 = entry.substring(0, 1);
@@ -132,4 +131,165 @@ export async function queryGitStatus(): Promise<GitStatusInfo> {
     }
   }
   return { deleted, untracked };
+}
+
+async function queryGitDiffRaw(
+  fromHash: string,
+  toHash: string,
+  arg: '--numstat' | '--name-status',
+  filter: string
+): Promise<readonly string[]> {
+  let args: string[];
+  const diffFilter = `--diff-filter=${filter}`;
+  if (fromHash === toHash) {
+    args = ['diff-tree', arg, '-r', '--root', '--find-renames', diffFilter, '-z', fromHash];
+  } else {
+    args = ['diff', arg, '--find-renames', diffFilter, '-z', fromHash];
+    if (toHash !== '') args.push(toHash);
+  }
+
+  const { stdout } = await startAsyncProcess('git', ...args);
+  const lines = stdout.split('\0');
+  if (fromHash === toHash) lines.shift();
+  return lines;
+}
+
+export type GitFileStatus = 'A' | 'M' | 'D' | 'R' | 'U';
+
+export interface GitDiffNameStatusRecord {
+  readonly type: GitFileStatus;
+  readonly oldFilePath: string;
+  readonly newFilePath: string;
+}
+
+export async function queryGitDiffNameStatus(
+  fromHash: string,
+  toHash: string,
+  filter = 'AMDR'
+): Promise<readonly GitDiffNameStatusRecord[]> {
+  const output = await queryGitDiffRaw(fromHash, toHash, '--name-status', filter);
+  const records: GitDiffNameStatusRecord[] = [];
+  let i = 0;
+  while (i < output.length && output[i] !== '') {
+    const type = checkNotNull(output?.[i]?.[0]);
+    if (type === 'A' || type === 'D' || type === 'M') {
+      const filePath = checkNotNull(output[i + 1]);
+      records.push({ type, oldFilePath: filePath, newFilePath: filePath });
+      i += 2;
+    } else if (type === 'R') {
+      records.push({
+        type,
+        oldFilePath: checkNotNull(output[i + 1]),
+        newFilePath: checkNotNull(output[i + 2]),
+      });
+      i += 3;
+    } else {
+      break;
+    }
+  }
+  return records;
+}
+
+export interface GitDiffNumStatRecord {
+  readonly filePath: string;
+  readonly additions: number;
+  readonly deletions: number;
+}
+
+export async function queryGitDiffNumStat(
+  fromHash: string,
+  toHash: string,
+  filter = 'AMDR'
+): Promise<readonly GitDiffNumStatRecord[]> {
+  const output = await queryGitDiffRaw(fromHash, toHash, '--numstat', filter);
+  const records: GitDiffNumStatRecord[] = [];
+  let i = 0;
+  while (i < output.length && output[i] !== '') {
+    const fields = checkNotNull(output[i]).split('\t');
+    if (fields.length !== 3) break;
+    if (fields[2] !== '') {
+      // Add, Modify, or Delete
+      records.push({
+        filePath: checkNotNull(fields[2]),
+        additions: parseInt(checkNotNull(fields[0]), 10),
+        deletions: parseInt(checkNotNull(fields[1]), 10),
+      });
+      i += 1;
+    } else {
+      // Rename
+      records.push({
+        filePath: checkNotNull(output[i + 2]),
+        additions: parseInt(checkNotNull(fields[0]), 10),
+        deletions: parseInt(checkNotNull(fields[1]), 10),
+      });
+      i += 3;
+    }
+  }
+  return records;
+}
+
+export interface GitFileChange {
+  readonly oldFilePath: string;
+  readonly newFilePath: string;
+  readonly type: GitFileStatus;
+  readonly additions: number | null;
+  readonly deletions: number | null;
+}
+
+/** @internal */
+export function generateGitFileChanges_EXPOSED_FOR_TESTING(
+  nameStatusRecords: readonly GitDiffNameStatusRecord[],
+  numStatRecords: readonly GitDiffNumStatRecord[],
+  status: GitStatusInfo | null
+): readonly GitFileChange[] {
+  const fileChanges: { -readonly [K in keyof GitFileChange]: GitFileChange[K] }[] = [];
+  const fileLookup: Record<string, number> = {};
+
+  nameStatusRecords.forEach((nameStatusRecord, index) => {
+    fileLookup[nameStatusRecord.newFilePath] = index;
+    fileChanges.push({
+      oldFilePath: nameStatusRecord.oldFilePath,
+      newFilePath: nameStatusRecord.newFilePath,
+      type: nameStatusRecord.type,
+      additions: null,
+      deletions: null,
+    });
+  });
+
+  if (status !== null) {
+    status.deleted.forEach((deletedFilePath) => {
+      if (typeof fileLookup[deletedFilePath] === 'number') {
+        checkNotNull(fileChanges[checkNotNull(fileLookup[deletedFilePath])]).type = 'D';
+      } else {
+        fileChanges.push({
+          oldFilePath: deletedFilePath,
+          newFilePath: deletedFilePath,
+          type: 'D',
+          additions: null,
+          deletions: null,
+        });
+      }
+    });
+    status.untracked.forEach((untrackedFilePath) => {
+      fileChanges.push({
+        oldFilePath: untrackedFilePath,
+        newFilePath: untrackedFilePath,
+        type: 'U',
+        additions: null,
+        deletions: null,
+      });
+    });
+  }
+
+  numStatRecords.forEach((numStatRecord) => {
+    if (typeof fileLookup[numStatRecord.filePath] === 'number') {
+      const fileChange = checkNotNull(
+        fileChanges[checkNotNull(fileLookup[numStatRecord.filePath])]
+      );
+      fileChange.additions = numStatRecord.additions;
+      fileChange.deletions = numStatRecord.deletions;
+    }
+  });
+
+  return fileChanges;
 }
