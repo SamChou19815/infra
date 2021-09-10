@@ -1,4 +1,11 @@
-import { queryGitLog, queryGitRef, queryGitStatus } from '..';
+import {
+  queryGitLog,
+  queryGitRef,
+  queryGitStatus,
+  queryGitDiffNameStatus,
+  queryGitDiffNumStat,
+  generateGitFileChanges_EXPOSED_FOR_TESTING,
+} from '..';
 
 describe('lib-git/query', () => {
   it('queryGitLog works', async () => {
@@ -24,5 +31,41 @@ describe('lib-git/query', () => {
   it('queryGitStatus works', async () => {
     const { deleted, untracked } = await queryGitStatus();
     [...deleted, ...untracked].forEach((filename) => expect(filename).toBeTruthy());
+  });
+
+  it('queryGitDiffNameStatus works', async () => {
+    const records = await queryGitDiffNameStatus('HEAD', '');
+    records.forEach(({ type, oldFilePath, newFilePath }) => {
+      expect(type).toBeTruthy();
+      expect(oldFilePath).toBeTruthy();
+      expect(newFilePath).toBeTruthy();
+    });
+  });
+
+  it('queryGitDiffNumStat works', async () => {
+    const records = await queryGitDiffNumStat('HEAD', '');
+    records.forEach(({ filePath, additions, deletions }) => {
+      expect(filePath).toBeTruthy();
+      expect(additions).toBeGreaterThanOrEqual(0);
+      expect(deletions).toBeGreaterThanOrEqual(0);
+    });
+  });
+
+  it('generateGitFileChanges_EXPOSED_FOR_TESTING works', async () => {
+    const [nameStatusRecords, numStatRecords, status] = await Promise.all([
+      queryGitDiffNameStatus('HEAD', ''),
+      queryGitDiffNumStat('HEAD', ''),
+      queryGitStatus(),
+    ]);
+    const changes = generateGitFileChanges_EXPOSED_FOR_TESTING(
+      nameStatusRecords,
+      numStatRecords,
+      status
+    );
+    changes.forEach(({ type, oldFilePath, newFilePath }) => {
+      expect(type).toBeTruthy();
+      expect(oldFilePath).toBeTruthy();
+      expect(newFilePath).toBeTruthy();
+    });
   });
 });
