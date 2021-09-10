@@ -1,4 +1,4 @@
-import { queryGitLog, queryGitRef } from '..';
+import { queryGitLog, queryGitRef, queryGitStatus } from '..';
 
 describe('lib-git/query', () => {
   it('queryGitLog works', async () => {
@@ -19,5 +19,10 @@ describe('lib-git/query', () => {
       expect(hash).toBeTruthy();
       expect(name).toBeTruthy();
     });
+  });
+
+  it('queryGitStatus works', async () => {
+    const { deleted, untracked } = await queryGitStatus();
+    [...deleted, ...untracked].forEach((filename) => expect(filename).toBeTruthy());
   });
 });
