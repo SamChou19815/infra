@@ -1,4 +1,4 @@
-import { queryGitLog, queryGitRef } from '../query';
+import { queryGitLog, queryGitRef } from '..';
 
 describe('lib-git/query', () => {
   it('queryGitLog works', async () => {
