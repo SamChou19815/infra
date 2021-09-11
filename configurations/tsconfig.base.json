@@ -6,6 +6,7 @@
     "forceConsistentCasingInFileNames": true,
     "importsNotUsedAsValues": "error",
     "isolatedModules": false,
+    "jsx": "react",
     "lib": ["esnext"],
     "module": "CommonJS",
     "moduleResolution": "node",
