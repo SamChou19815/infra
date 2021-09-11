@@ -1,12 +1,3 @@
-# GCC/LLVM output
-*.o
-samlang-runtime/*.a
-samlang-runtime/example
-samlang-runtime/*.bc
-
-# Libraries
-samlang-runtime/compiled-wasi-libc
-
 # Node
 node_modules
 
@@ -15,6 +6,7 @@ node_modules
 
 ## Compiled output
 *.vsix
+*.map
 out
 bin
 build
