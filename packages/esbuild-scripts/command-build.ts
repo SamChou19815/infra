@@ -3,6 +3,7 @@
 import { dirname, join, resolve, relative } from 'path';
 
 import { build } from 'esbuild';
+import { copyDirectoryContent, ensureDirectory, remove, writeFile } from 'lib-base/fs';
 
 import baseESBuildConfig from './esbuild/esbuild-config';
 import type { VirtualPathMappings } from './esbuild/esbuild-virtual-path-plugin';
@@ -16,7 +17,6 @@ import {
   virtualEntryComponentsToVirtualPathMappings,
   createEntryPointsGeneratedVirtualFiles,
 } from './utils/entry-points';
-import { copyDirectoryContent, ensureDirectory, remove, writeFile } from './utils/fs';
 import getGeneratedHTML, { SSRResult } from './utils/html-generator';
 
 async function generateBundle(

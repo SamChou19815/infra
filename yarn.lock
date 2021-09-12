@@ -2754,6 +2754,7 @@ __metadata:
     "@types/react-router-dom": ^5.1.7
     "@types/sass": ^1.16.0
     esbuild: ^0.12.25
+    lib-base: "workspace:0.1.0"
     react-helmet: ^6.1.0
     react-router-dom: ^5.2.0
     remark-slug: ^6.0.0

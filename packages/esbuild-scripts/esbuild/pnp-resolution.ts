@@ -13,11 +13,11 @@ const extensions = ['.tsx', '.ts', '.jsx', '.mjs', '.cjs', '.js', '.json'];
 const isStrictRegExp = /^(\/|\.{1,2}(\/|$))/;
 const isRelativeRegexp = /^\.{0,2}\//;
 
-export const resolvePackageEntry = (
+function resolvePackageEntry(
   packageJsonContent: unknown,
   entry: string,
   browser: boolean
-): string | null => {
+): string | null {
   const exportedPath = resolve(packageJsonContent, entry, { browser, require: !browser });
   if (exportedPath != null) return exportedPath;
   const legacyPath = legacy(
@@ -33,22 +33,22 @@ export const resolvePackageEntry = (
     legacyPath[`./${entry}.js`] ||
     null
   );
-};
+}
 
-const pathContains = (pathFrom: string, pathTo: string): string | null => {
+function pathContains(pathFrom: string, pathTo: string): string | null {
   let from = normalize(pathFrom);
   const to = normalize(pathTo);
 
   if (from === to) return '.';
   if (!from.endsWith(sep)) from = from + sep;
   return to.startsWith(from) ? to.slice(from.length) : null;
-};
+}
 
 /**
  * Forked from Yarn:
  * https://github.com/yarnpkg/berry/blob/30e1d3c52f895721aefd55dea8f21b75bdf3d4ff/packages/yarnpkg-pnp/sources/loader/makeApi.ts#L202-L245
  */
-const applyNodeExportsResolution = (unqualifiedPath: string, pnpApi: PnpApi, browser: boolean) => {
+function applyNodeExportsResolution(unqualifiedPath: string, pnpApi: PnpApi, browser: boolean) {
   const locator = pnpApi.findPackageLocator(join(unqualifiedPath, 'internal.js'));
   if (locator == null) throw new Error();
   const { packageLocation } = pnpApi.getPackageInformation(locator);
@@ -62,18 +62,18 @@ const applyNodeExportsResolution = (unqualifiedPath: string, pnpApi: PnpApi, bro
   subpath = normalize(subpath);
   const remappedSubpath = resolvePackageEntry(pkgJson, subpath, browser);
   return remappedSubpath != null ? join(packageLocation, remappedSubpath) : null;
-};
+}
 
 /**
  * Copied from Yarn:
  * https://github.com/yarnpkg/berry/blob/30e1d3c52f895721aefd55dea8f21b75bdf3d4ff/packages/yarnpkg-pnp/sources/loader/makeApi.ts#L781-L791
  */
-const resolveUnqualifiedExport = (
+function resolveUnqualifiedExport(
   request: string,
   unqualifiedPath: string,
   pnpApi: PnpApi,
   browser: boolean
-): string => {
+): string {
   if (isStrictRegExp.test(request)) {
     return unqualifiedPath;
   }
@@ -84,14 +84,14 @@ const resolveUnqualifiedExport = (
   } else {
     return unqualifiedPath;
   }
-};
+}
 
-const resolveRequest = (
+export default function resolveRequest(
   request: string,
   issuer: string,
   pnpApi: PnpApi,
   browser: boolean
-): string | null => {
+): string | null {
   const unqualifiedPath = pnpApi.resolveToUnqualified(request, issuer);
   if (unqualifiedPath == null) return null;
 
@@ -99,6 +99,4 @@ const resolveRequest = (
     resolveUnqualifiedExport(request, unqualifiedPath, pnpApi, browser),
     { extensions }
   );
-};
-
-export default resolveRequest;
+}
