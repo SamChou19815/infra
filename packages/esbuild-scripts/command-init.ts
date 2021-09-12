@@ -1,7 +1,8 @@
 import { join } from 'path';
 
+import { copyFile, ensureDirectory, writeFile } from 'lib-base/fs';
+
 import { TEMPLATE_PATH, PAGES_PATH } from './utils/constants';
-import { copyFile, ensureDirectory, writeFile } from './utils/fs';
 
 export default async function initCommand(): Promise<void> {
   await ensureDirectory(PAGES_PATH);

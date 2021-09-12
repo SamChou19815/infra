@@ -2,9 +2,9 @@ import { createRequire } from 'module';
 import { dirname, resolve } from 'path';
 
 import type { Plugin } from 'esbuild';
+import { readFile } from 'lib-base/fs';
 import { Result as SassResult, render } from 'sass';
 
-import { readFile } from '../utils/fs';
 import compileMarkdownToReact from '../utils/mdx';
 import pnpPlugin from './esbuild-pnp-plugin';
 import virtualPathResolvePlugin, { VirtualPathMappings } from './esbuild-virtual-path-plugin';
