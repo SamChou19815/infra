@@ -24,6 +24,7 @@ bundles
 **/.pnp
 **/.pnp.js
 **/.pnp.cjs
+**/.pnp.loader.mjs
 
 ## Cache
 .eslintcache

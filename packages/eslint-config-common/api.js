@@ -24,6 +24,7 @@ module.exports = (
     'plugin:@typescript-eslint/recommended',
     ...[jsxA11Y, react].filter(Boolean).map((packageName) => `plugin:${packageName}/recommended`),
   ],
+  reportUnusedDisableDirectives: true,
   parser: resolvedTypescriptESLintParserModulePath,
   plugins: ['@typescript-eslint', 'import', ...[jsxA11Y, react, reactHooks].filter(Boolean)],
   rules: {
