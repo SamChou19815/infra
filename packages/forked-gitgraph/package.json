@@ -1,0 +1,13 @@
+{
+  "name": "@forked/git-graph",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "compile": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.2",
+    "@types/node": "^16.11.6",
+    "typescript": "^4.4.4"
+  }
+}

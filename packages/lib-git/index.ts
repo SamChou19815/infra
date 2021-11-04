@@ -1,7 +1,6 @@
 import { assert, checkNotNull } from 'lib-base/general';
 import startAsyncProcess from 'lib-base/shell';
 
-const DRIVE_LETTER_PATH_REGEX = /^[a-z]:\//;
 const EOL_REGEX = /\r\n|\r|\n/g;
 const INVALID_BRANCH_REGEXP = /^\(.* .*\)$/;
 const REMOTE_HEAD_BRANCH_REGEXP = /^remotes\/.*\/HEAD$/;
@@ -14,6 +13,79 @@ export interface GitLogEntry {
   readonly authorEmail: string;
   readonly commitTime: Date;
   readonly subject: string;
+}
+
+export interface GitRef {
+  readonly hash: string;
+  readonly name: string;
+}
+
+export interface GitTag extends GitRef, GitCommitTag {
+  readonly annotated: boolean;
+}
+
+export interface GitRefInfo {
+  readonly headHash: string;
+  readonly heads: readonly GitRef[];
+  readonly tags: readonly GitTag[];
+  readonly remotes: readonly GitRef[];
+}
+
+export interface GitStatusInfo {
+  readonly deleted: readonly string[];
+  readonly untracked: readonly string[];
+}
+
+export type GitFileStatus = 'A' | 'M' | 'D' | 'R' | 'U';
+
+export interface GitDiffNameStatusRecord {
+  readonly type: GitFileStatus;
+  readonly oldFilePath: string;
+  readonly newFilePath: string;
+}
+
+export interface GitDiffNumStatRecord {
+  readonly filePath: string;
+  readonly additions: number;
+  readonly deletions: number;
+}
+
+export interface GitCommitTag {
+  readonly name: string;
+  readonly annotated: boolean;
+}
+
+export interface GitCommitRemote {
+  readonly name: string;
+  /** null => remote not found, otherwise => remote name */
+  readonly remote: string | null;
+}
+
+export interface GitCommitStash {
+  readonly selector: string;
+  readonly baseHash: string;
+  readonly untrackedFilesHash: string | null;
+}
+
+export interface GitCommit {
+  readonly hash: string;
+  readonly parents: readonly string[];
+  readonly author: string;
+  readonly email: string;
+  readonly date: number;
+  readonly message: string;
+  readonly heads: readonly string[];
+  readonly tags: readonly GitCommitTag[];
+  readonly remotes: readonly GitCommitRemote[];
+  /** null => not a stash, otherwise => stash info */
+  readonly stash: GitCommitStash | null;
+}
+
+export interface GitCommitData {
+  readonly commits: readonly GitCommit[];
+  readonly head: string | null;
+  readonly tags: readonly string[];
+  readonly moreCommitsAvailable: boolean;
 }
 
 export async function queryGitLog(cwd?: string, limit = 100): Promise<readonly GitLogEntry[]> {
@@ -40,24 +112,6 @@ export async function queryGitLog(cwd?: string, limit = 100): Promise<readonly G
       subject,
     };
   });
-}
-
-export interface GitRef {
-  readonly hash: string;
-  readonly name: string;
-}
-
-export interface GitTag extends GitRef {
-  readonly annotated: boolean;
-}
-
-//
-
-export interface GitRefInfo {
-  readonly headHash: string;
-  readonly heads: readonly GitRef[];
-  readonly tags: readonly GitTag[];
-  readonly remotes: readonly GitRef[];
 }
 
 export async function queryGitRef(cwd?: string): Promise<GitRefInfo> {
@@ -88,11 +142,6 @@ export async function queryGitRef(cwd?: string): Promise<GitRefInfo> {
   });
 
   return { headHash: checkNotNull(headHash), heads, tags, remotes };
-}
-
-export interface GitStatusInfo {
-  readonly deleted: readonly string[];
-  readonly untracked: readonly string[];
 }
 
 export async function queryGitStatus(cwd?: string): Promise<GitStatusInfo> {
@@ -149,14 +198,6 @@ async function queryGitDiffRaw(
   return lines;
 }
 
-export type GitFileStatus = 'A' | 'M' | 'D' | 'R' | 'U';
-
-export interface GitDiffNameStatusRecord {
-  readonly type: GitFileStatus;
-  readonly oldFilePath: string;
-  readonly newFilePath: string;
-}
-
 export async function queryGitDiffNameStatus(
   fromHash: string,
   toHash: string,
@@ -184,12 +225,6 @@ export async function queryGitDiffNameStatus(
     }
   }
   return records;
-}
-
-export interface GitDiffNumStatRecord {
-  readonly filePath: string;
-  readonly additions: number;
-  readonly deletions: number;
 }
 
 export async function queryGitDiffNumStat(
