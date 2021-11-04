@@ -510,6 +510,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@forked/git-graph@workspace:packages/forked-gitgraph":
+  version: 0.0.0-use.local
+  resolution: "@forked/git-graph@workspace:packages/forked-gitgraph"
+  dependencies:
+    "@types/jest": ^27.0.2
+    "@types/node": ^16.11.6
+    typescript: ^4.4.4
+  languageName: unknown
+  linkType: soft
+
 "@gar/promisify@npm:^1.0.1":
   version: 1.1.2
   resolution: "@gar/promisify@npm:1.1.2"

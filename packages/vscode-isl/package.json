@@ -19,7 +19,8 @@
     "commands": [
       {
         "command": "dev-sam.vscode-isl.start",
-        "title": "Open Interactive SmartLog"
+        "title": "Open Interactive SmartLog",
+        "category": "Interactive SmartLog"
       }
     ]
   },
