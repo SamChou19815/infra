@@ -1190,34 +1190,34 @@ function unique(items: readonly string[]) {
 /* Types */
 
 interface DiffNameStatusRecord {
-  type: GitFileStatus;
-  oldFilePath: string;
-  newFilePath: string;
+  readonly type: GitFileStatus;
+  readonly oldFilePath: string;
+  readonly newFilePath: string;
 }
 
 interface DiffNumStatRecord {
-  filePath: string;
-  additions: number;
-  deletions: number;
+  readonly filePath: string;
+  readonly additions: number;
+  readonly deletions: number;
 }
 
 interface GitBranchData {
-  branches: string[];
+  readonly branches: string[];
   head: string | null;
-  error: ErrorInfo;
+  readonly error: ErrorInfo;
 }
 
 interface GitCommitRecord {
-  hash: string;
-  parents: string[];
-  author: string;
-  email: string;
-  date: number;
-  message: string;
+  readonly hash: string;
+  readonly parents: string[];
+  readonly author: string;
+  readonly email: string;
+  readonly date: number;
+  readonly message: string;
 }
 
 interface GitCommitData {
-  readonly commits: GitCommit[];
+  readonly commits: readonly GitCommit[];
   readonly head: string | null;
   readonly tags: readonly string[];
   readonly moreCommitsAvailable: boolean;
@@ -1225,49 +1225,49 @@ interface GitCommitData {
 }
 
 export interface GitCommitDetailsData {
-  commitDetails: GitCommitDetails | null;
-  error: ErrorInfo;
+  readonly commitDetails: GitCommitDetails | null;
+  readonly error: ErrorInfo;
 }
 
 interface GitCommitComparisonData {
-  fileChanges: GitFileChange[];
-  error: ErrorInfo;
+  readonly fileChanges: readonly GitFileChange[];
+  readonly error: ErrorInfo;
 }
 
 type GitConfigSet = { [key: string]: string };
 
 interface GitRef {
-  hash: string;
-  name: string;
+  readonly hash: string;
+  readonly name: string;
 }
 
 interface GitRefTag extends GitRef {
-  annotated: boolean;
+  readonly annotated: boolean;
 }
 
 interface GitRefData {
   head: string | null;
   heads: GitRef[];
-  tags: GitRefTag[];
-  remotes: GitRef[];
+  readonly tags: GitRefTag[];
+  readonly remotes: GitRef[];
 }
 
 interface GitRepoInfo extends GitBranchData {
-  remotes: string[];
-  stashes: GitStash[];
+  readonly remotes: string[];
+  readonly stashes: GitStash[];
 }
 
 interface GitRepoConfigData {
-  config: GitRepoConfig | null;
-  error: ErrorInfo;
+  readonly config: GitRepoConfig | null;
+  readonly error: ErrorInfo;
 }
 
 interface GitStatusFiles {
-  deleted: string[];
-  untracked: string[];
+  readonly deleted: string[];
+  readonly untracked: string[];
 }
 
 interface GitTagDetailsData {
-  details: GitTagDetails | null;
-  error: ErrorInfo;
+  readonly details: GitTagDetails | null;
+  readonly error: ErrorInfo;
 }

@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "module": "commonjs",
+    "noEmit": true,
+    "lib": ["es6"],
+    "strict": true,
+    "noImplicitAny": true,
+    "rootDir": "."
+  }
+}

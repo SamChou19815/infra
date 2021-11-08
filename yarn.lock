@@ -1133,6 +1133,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/vscode@npm:1.47.0":
+  version: 1.47.0
+  resolution: "@types/vscode@npm:1.47.0"
+  checksum: fa37e39f97ad7a17a23c9f4e174a0aa3524833681d444f416195e13d9cdfc78bed1b1a4c7702510df5ca0318d0a2daa45baa6eb342185869aa61ce772eeaf9d2
+  languageName: node
+  linkType: hard
+
 "@types/vscode@npm:1.61.0":
   version: 1.61.0
   resolution: "@types/vscode@npm:1.61.0"
@@ -6483,6 +6490,15 @@ resolve@^1.20.0:
   checksum: c7dabf9567e0c210b24d0720e553803cbe1ff81edb1ec7f2080eb4be01ed081a40286cc9f4aaa86d1bf8d57840cefae8fdf326b7cb8faa316ba50c7b948030d4
   languageName: node
   linkType: hard
+
+"vscode-disable-generated-files-edit@workspace:packages/vscode-disable-generated-files-edit":
+  version: 0.0.0-use.local
+  resolution: "vscode-disable-generated-files-edit@workspace:packages/vscode-disable-generated-files-edit"
+  dependencies:
+    "@types/vscode": 1.47.0
+    typescript: ^4.4.4
+  languageName: unknown
+  linkType: soft
 
 "vscode-isl@workspace:packages/vscode-isl":
   version: 0.0.0-use.local
