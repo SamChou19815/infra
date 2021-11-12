@@ -1,5 +1,4 @@
 import {
-  CommitOrdering,
   DeepWriteable,
   ErrorInfo,
   GitCommit,
@@ -21,14 +20,6 @@ const EOL_REGEX = /\r\n|\r|\n/g;
 const INVALID_BRANCH_REGEXP = /^\(.* .*\)$/;
 const REMOTE_HEAD_BRANCH_REGEXP = /^remotes\/.*\/HEAD$/;
 const GIT_LOG_SEPARATOR = 'XX7Nal-YARtTpjCikii9nJxER19D6diSyk-AWkPb';
-
-class GitConfigKey {
-  static DiffGuiTool = 'diff.guitool';
-  static DiffTool = 'diff.tool';
-  static RemotePushDefault = 'remote.pushdefault';
-  static UserEmail = 'user.email';
-  static UserName = 'user.name';
-}
 
 const gitFormatCommitDetails: string = [
   '%H',
@@ -76,7 +67,7 @@ export default class GitDataSource {
       }),
       this.getStashes(),
     ]);
-    return { branches, head, remotes, stashes, error: null };
+    return { branches, head, remotes, stashes };
   }
 
   /**
@@ -84,7 +75,6 @@ export default class GitDataSource {
    *
    * @param branches The list of branch heads to display, or NULL (show all).
    * @param maxCommits The maximum number of commits to return.
-   * @param commitOrdering The order for commits to be returned.
    * @param remotes An array of known remotes.
    * @param hideRemotes An array of hidden remotes.
    * @param stashes An array of all stashes in the repository.
@@ -93,14 +83,13 @@ export default class GitDataSource {
   public async getCommits(
     branches: readonly string[] | null,
     maxCommits: number,
-    commitOrdering: CommitOrdering,
     remotes: readonly string[],
     hideRemotes: readonly string[],
     stashes: ReadonlyArray<GitStash>
   ): Promise<GitCommitData> {
     // eslint-disable-next-line prefer-const
     let [commits, refData] = await Promise.all([
-      this.getLog(branches, maxCommits + 1, commitOrdering, remotes, hideRemotes, stashes),
+      this.getLog(branches, maxCommits + 1, remotes, hideRemotes, stashes),
       this.getRefs(hideRemotes).then(
         (it) => it,
         (errorMessage: string) => errorMessage
@@ -222,94 +211,65 @@ export default class GitDataSource {
       head: refData.head,
       tags: unique(refData.tags.map((tag) => tag.name)),
       moreCommitsAvailable,
-      error: null,
     };
   }
 
-  public getConfig(remotes: readonly string[]): Promise<GitRepoConfigData> {
-    return Promise.all([
+  public async getConfig(remotes: readonly string[]): Promise<GitRepoConfig> {
+    const [consolidatedConfigs, localConfigs] = await Promise.all([
       this.getConfigList(),
       this.getConfigList(GitConfigLocation.Local),
-      this.getConfigList(GitConfigLocation.Global),
-    ])
-      .then((results) => {
-        const consolidatedConfigs = results[0];
-        const localConfigs = results[1];
-        const globalConfigs = results[2];
+    ]);
+    const branches: GitRepoConfigBranches = {};
+    Object.keys(localConfigs).forEach((key) => {
+      if (key.startsWith('branch.')) {
+        if (key.endsWith('.remote')) {
+          const branchName = key.substring(7, key.length - 7);
+          branches[branchName] = {
+            pushRemote:
+              typeof branches[branchName] !== 'undefined' ? branches[branchName].pushRemote : null,
+            remote: localConfigs[key],
+          };
+        } else if (key.endsWith('.pushremote')) {
+          const branchName = key.substring(7, key.length - 11);
+          branches[branchName] = {
+            pushRemote: localConfigs[key],
+            remote:
+              typeof branches[branchName] !== 'undefined' ? branches[branchName].remote : null,
+          };
+        }
+      }
+    });
 
-        const branches: GitRepoConfigBranches = {};
-        Object.keys(localConfigs).forEach((key) => {
-          if (key.startsWith('branch.')) {
-            if (key.endsWith('.remote')) {
-              const branchName = key.substring(7, key.length - 7);
-              branches[branchName] = {
-                pushRemote:
-                  typeof branches[branchName] !== 'undefined'
-                    ? branches[branchName].pushRemote
-                    : null,
-                remote: localConfigs[key],
-              };
-            } else if (key.endsWith('.pushremote')) {
-              const branchName = key.substring(7, key.length - 11);
-              branches[branchName] = {
-                pushRemote: localConfigs[key],
-                remote:
-                  typeof branches[branchName] !== 'undefined' ? branches[branchName].remote : null,
-              };
-            }
-          }
-        });
-
-        return {
-          config: {
-            branches,
-            diffTool: getConfigValue(consolidatedConfigs, GitConfigKey.DiffTool),
-            guiDiffTool: getConfigValue(consolidatedConfigs, GitConfigKey.DiffGuiTool),
-            pushDefault: getConfigValue(consolidatedConfigs, GitConfigKey.RemotePushDefault),
-            remotes: remotes.map((remote) => ({
-              name: remote,
-              url: getConfigValue(localConfigs, `remote.${remote}.url`),
-              pushUrl: getConfigValue(localConfigs, `remote.${remote}.pushurl`),
-            })),
-            user: {
-              name: {
-                local: getConfigValue(localConfigs, GitConfigKey.UserName),
-                global: getConfigValue(globalConfigs, GitConfigKey.UserName),
-              },
-              email: {
-                local: getConfigValue(localConfigs, GitConfigKey.UserEmail),
-                global: getConfigValue(globalConfigs, GitConfigKey.UserEmail),
-              },
-            },
-          },
-          error: null,
-        };
-      })
-      .catch((errorMessage) => {
-        return { config: null, error: errorMessage };
-      });
+    return {
+      branches,
+      pushDefault: getConfigValue(consolidatedConfigs, 'remote.pushdefault'),
+      remotes: remotes.map((remote) => ({
+        name: remote,
+        url: getConfigValue(localConfigs, `remote.${remote}.url`),
+        pushUrl: getConfigValue(localConfigs, `remote.${remote}.pushurl`),
+      })),
+    };
   }
 
   /* Get Data Methods - Commit Details View */
 
-  public getCommitDetails(commitHash: string, hasParents: boolean): Promise<GitCommitDetailsData> {
+  public getCommitDetails(commitHash: string, hasParents: boolean): Promise<GitCommitDetails> {
     const fromCommit = commitHash + (hasParents ? '^' : '');
     return Promise.all([
       this.getCommitDetailsBase(commitHash),
       this.getDiffNameStatus(fromCommit, commitHash),
       this.getDiffNumStat(fromCommit, commitHash),
-    ])
-      .then((results) => {
-        results[0].fileChanges = generateFileChanges(results[1], results[2], null);
-        return { commitDetails: results[0], error: null };
-      })
-      .catch((errorMessage) => {
-        return { commitDetails: null, error: errorMessage };
-      });
+    ]).then((results) => {
+      results[0].fileChanges = generateFileChanges(results[1], results[2], null);
+      return results[0];
+    });
   }
 
-  public getStashDetails(commitHash: string, stash: GitCommitStash): Promise<GitCommitDetailsData> {
-    return Promise.all([
+  public async getStashDetails(
+    commitHash: string,
+    stash: GitCommitStash
+  ): Promise<GitCommitDetails> {
+    const results = await Promise.all([
       this.getCommitDetailsBase(commitHash),
       this.getDiffNameStatus(stash.baseHash, commitHash),
       this.getDiffNumStat(stash.baseHash, commitHash),
@@ -319,51 +279,37 @@ export default class GitDataSource {
       stash.untrackedFilesHash !== null
         ? this.getDiffNumStat(stash.untrackedFilesHash, stash.untrackedFilesHash)
         : Promise.resolve([]),
-    ])
-      .then((results) => {
-        results[0].fileChanges = generateFileChanges(results[1], results[2], null);
-        if (stash.untrackedFilesHash !== null) {
-          generateFileChanges(results[3], results[4], null).forEach((fileChange) => {
-            if (fileChange.type === GitFileStatus.Added) {
-              fileChange.type = GitFileStatus.Untracked;
-              results[0].fileChanges.push(fileChange);
-            }
-          });
+    ]);
+    results[0].fileChanges = generateFileChanges(results[1], results[2], null);
+    if (stash.untrackedFilesHash !== null) {
+      generateFileChanges(results[3], results[4], null).forEach((fileChange) => {
+        if (fileChange.type === GitFileStatus.Added) {
+          fileChange.type = GitFileStatus.Untracked;
+          results[0].fileChanges.push(fileChange);
         }
-        return { commitDetails: results[0], error: null };
-      })
-      .catch((errorMessage) => {
-        return { commitDetails: null, error: errorMessage };
       });
+    }
+    return results[0];
   }
 
-  public getUncommittedDetails(): Promise<GitCommitDetailsData> {
-    return Promise.all([
+  public async getUncommittedDetails(): Promise<GitCommitDetails> {
+    const results = await Promise.all([
       this.getDiffNameStatus('HEAD', ''),
       this.getDiffNumStat('HEAD', ''),
       this.getStatus(),
-    ])
-      .then((results) => {
-        return {
-          commitDetails: {
-            hash: UNCOMMITTED,
-            parents: [],
-            author: '',
-            authorEmail: '',
-            authorDate: 0,
-            committer: '',
-            committerEmail: '',
-            committerDate: 0,
-            signature: null,
-            body: '',
-            fileChanges: generateFileChanges(results[0], results[1], results[2]),
-          },
-          error: null,
-        };
-      })
-      .catch((errorMessage) => {
-        return { commitDetails: null, error: errorMessage };
-      });
+    ]);
+    return {
+      hash: UNCOMMITTED,
+      parents: [],
+      author: '',
+      authorEmail: '',
+      authorDate: 0,
+      committer: '',
+      committerEmail: '',
+      committerDate: 0,
+      body: '',
+      fileChanges: generateFileChanges(results[0], results[1], results[2]),
+    };
   }
 
   /**
@@ -373,21 +319,20 @@ export default class GitDataSource {
    * @param toHash The commit hash the comparison is to.
    * @returns The comparison details.
    */
-  public getCommitComparison(fromHash: string, toHash: string): Promise<GitCommitComparisonData> {
-    return Promise.all<DiffNameStatusRecord[], DiffNumStatRecord[], GitStatusFiles | null>([
+  public async getCommitComparison(
+    fromHash: string,
+    toHash: string
+  ): Promise<readonly GitFileChange[]> {
+    const results = await Promise.all<
+      DiffNameStatusRecord[],
+      DiffNumStatRecord[],
+      GitStatusFiles | null
+    >([
       this.getDiffNameStatus(fromHash, toHash === UNCOMMITTED ? '' : toHash),
       this.getDiffNumStat(fromHash, toHash === UNCOMMITTED ? '' : toHash),
       toHash === UNCOMMITTED ? this.getStatus() : Promise.resolve(null),
-    ])
-      .then((results) => {
-        return {
-          fileChanges: generateFileChanges(results[0], results[1], results[2]),
-          error: null,
-        };
-      })
-      .catch((errorMessage) => {
-        return { fileChanges: [], error: errorMessage };
-      });
+    ]);
+    return generateFileChanges(results[0], results[1], results[2]);
   }
 
   /**
@@ -669,7 +614,7 @@ export default class GitDataSource {
 
   /* Private Data Providers */
 
-  private getBranches(hideRemotes: readonly string[]) {
+  private getBranches(hideRemotes: readonly string[]): Promise<GitBranchData> {
     const args = ['branch'];
     args.push('-a');
     args.push('--no-color');
@@ -677,7 +622,8 @@ export default class GitDataSource {
     const hideRemotePatterns = hideRemotes.map((remote) => `remotes/${remote}/`);
 
     return this.spawnGit(args, (stdout) => {
-      const branchData: GitBranchData = { branches: [], head: null, error: null };
+      const branches: string[] = [];
+      let head: string | null = null;
       const lines = stdout.split(EOL_REGEX);
       for (let i = 0; i < lines.length - 1; i++) {
         const name = lines[i].substring(2).split(' -> ')[0];
@@ -690,13 +636,13 @@ export default class GitDataSource {
         }
 
         if (lines[i][0] === '*') {
-          branchData.head = name;
-          branchData.branches.unshift(name);
+          head = name;
+          branches.unshift(name);
         } else {
-          branchData.branches.push(name);
+          branches.push(name);
         }
       }
-      return branchData;
+      return { branches, head };
     });
   }
 
@@ -853,8 +799,6 @@ export default class GitDataSource {
    *
    * @param branches The list of branch heads to display, or NULL (show all).
    * @param num The maximum number of commits to return.
-   * @param includeTags Include commits only referenced by tags.
-   * @param order The order for commits to be returned.
    * @param remotes An array of the known remotes.
    * @param hideRemotes An array of hidden remotes.
    * @param stashes An array of all stashes in the repository.
@@ -863,7 +807,6 @@ export default class GitDataSource {
   private getLog(
     branches: readonly string[] | null,
     num: number,
-    order: CommitOrdering,
     remotes: readonly string[],
     hideRemotes: readonly string[],
     stashes: readonly GitStash[]
@@ -874,7 +817,7 @@ export default class GitDataSource {
       'log',
       `--max-count=${num}`,
       `--format=${gitFormatLog}`,
-      `--${order}-order`,
+      `--author-date-order`,
     ];
     if (branches !== null) {
       for (let i = 0; i < branches.length; i++) {
@@ -1202,9 +1145,8 @@ interface DiffNumStatRecord {
 }
 
 interface GitBranchData {
-  readonly branches: string[];
-  head: string | null;
-  readonly error: ErrorInfo;
+  readonly branches: readonly string[];
+  readonly head: string | null;
 }
 
 interface GitCommitRecord {
@@ -1221,17 +1163,6 @@ interface GitCommitData {
   readonly head: string | null;
   readonly tags: readonly string[];
   readonly moreCommitsAvailable: boolean;
-  readonly error: ErrorInfo;
-}
-
-export interface GitCommitDetailsData {
-  readonly commitDetails: GitCommitDetails | null;
-  readonly error: ErrorInfo;
-}
-
-interface GitCommitComparisonData {
-  readonly fileChanges: readonly GitFileChange[];
-  readonly error: ErrorInfo;
 }
 
 type GitConfigSet = { [key: string]: string };
@@ -1255,11 +1186,6 @@ interface GitRefData {
 interface GitRepoInfo extends GitBranchData {
   readonly remotes: string[];
   readonly stashes: GitStash[];
-}
-
-interface GitRepoConfigData {
-  readonly config: GitRepoConfig | null;
-  readonly error: ErrorInfo;
 }
 
 interface GitStatusFiles {
