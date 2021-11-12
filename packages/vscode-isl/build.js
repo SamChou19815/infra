@@ -1,3 +1,5 @@
+const { readFile } = require('fs/promises');
+
 const { pnpPlugin } = require('@yarnpkg/esbuild-plugin-pnp');
 const { build } = require('esbuild');
 
@@ -35,6 +37,19 @@ async function main() {
           buildConfig.onLoad(
             { filter: /virtual-module-webview-content-js/, namespace: 'virtual-path' },
             () => ({ contents: bundleWebViewContentOutputFile.text, loader: 'text' })
+          );
+
+          buildConfig.onResolve({ filter: /virtual-module-webview-content-css/ }, (args) => ({
+            path: args.path,
+            namespace: 'virtual-path',
+          }));
+
+          buildConfig.onLoad(
+            { filter: /virtual-module-webview-content-css/, namespace: 'virtual-path' },
+            async () => ({
+              contents: await readFile('src/react/index.css'),
+              loader: 'text',
+            })
           );
         },
       },
