@@ -1,21 +1,21 @@
-import type { GitLogEntry } from 'lib-git';
+import type { GitCommitData } from '@forked/git-graph/git-data-source';
 import { Store, createStore } from 'redux';
 
 import type { ExtensionToWebviewMessage } from '../message-types';
 
 export interface GlobalState {
-  readonly gitLogs: readonly GitLogEntry[];
+  readonly gitCommitData: GitCommitData | null;
 }
 
-const initialState: GlobalState = { gitLogs: [] };
+const initialState: GlobalState = { gitCommitData: null };
 
 function reducer(
   state: GlobalState = initialState,
   message: ExtensionToWebviewMessage
 ): GlobalState {
   switch (message.type) {
-    case 'git-info':
-      return { ...state, gitLogs: message.gitLogs };
+    case 'git-commit-data':
+      return { ...state, gitCommitData: message.gitCommitData };
     default:
       return state;
   }

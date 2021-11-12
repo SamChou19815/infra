@@ -1,4 +1,5 @@
-import { queryGitLog } from 'lib-git';
+import GitDataSource from '@forked/git-graph/git-data-source';
+import INLINE_CSS from 'virtual-module-webview-content-css';
 import BUNDLED_JS from 'virtual-module-webview-content-js';
 import * as vscode from 'vscode';
 
@@ -33,8 +34,16 @@ export function activate(context: vscode.ExtensionContext): void {
           async (message: WebviewToExtensionMessage) => {
             switch (message.type) {
               case 'fetch-git': {
-                const gitLogs = await queryGitLog(getRepoRoots()[0], 100);
-                await sendMessage({ type: 'git-info', gitLogs });
+                const source = new GitDataSource(getRepoRoots()[0]);
+                const info = await source.getRepoInfo([]);
+                const gitCommitData = await source.getCommits(
+                  null,
+                  100,
+                  info.remotes,
+                  [],
+                  info.stashes
+                );
+                await sendMessage({ type: 'git-commit-data', gitCommitData });
                 return;
               }
             }
@@ -63,7 +72,11 @@ function getRepoRoots(): readonly string[] {
 }
 
 function getWebviewHTML(): string {
-  return `<!DOCTYPE html><html><head></head><body><div id="root"></div>
+  return `<!DOCTYPE html><html><head>
+<style>
+${INLINE_CSS}
+</style>
+</head><body><div id="root"></div>
 <script type="text/javascript">
 ${BUNDLED_JS}
 </script>

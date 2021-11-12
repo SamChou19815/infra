@@ -1158,7 +1158,7 @@ interface GitCommitRecord {
   readonly message: string;
 }
 
-interface GitCommitData {
+export interface GitCommitData {
   readonly commits: readonly GitCommit[];
   readonly head: string | null;
   readonly tags: readonly string[];

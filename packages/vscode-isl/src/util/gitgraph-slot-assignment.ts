@@ -34,7 +34,9 @@ export default function gitGraphSlotAssignment<C extends SimplifiedCommitNode>(
     const chainCandidates: CommitChain<C>[] = [];
     commit.parents.forEach((parentHash) => {
       if (visited.has(parentHash)) return;
-      chainCandidates.push(formChainMemoized(hashToCommitMap[parentHash]));
+      const commitOfHash = hashToCommitMap[parentHash];
+      if (commitOfHash == null) return;
+      chainCandidates.push(formChainMemoized(commitOfHash));
     });
     let bestChain: CommitChain<C> = null;
     for (const chain of chainCandidates) {
