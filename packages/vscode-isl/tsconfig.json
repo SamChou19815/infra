@@ -2,7 +2,8 @@
   "extends": "../../configurations/tsconfig.base.json",
   "compilerOptions": {
     "lib": ["ESNext", "DOM"],
-    "types": ["react", "react-dom", "node", "vscode"]
+    "noUncheckedIndexedAccess": false,
+    "types": ["react", "react-dom", "jest", "node", "vscode"]
   },
   "include": ["src"]
 }

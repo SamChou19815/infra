@@ -73,20 +73,8 @@ export enum GitPushBranchMode {
 
 export interface GitRepoConfig {
   readonly branches: GitRepoConfigBranches;
-  readonly diffTool: string | null;
-  readonly guiDiffTool: string | null;
   readonly pushDefault: string | null;
-  readonly remotes: ReadonlyArray<GitRepoSettingsRemote>;
-  readonly user: {
-    readonly name: {
-      readonly local: string | null;
-      readonly global: string | null;
-    };
-    readonly email: {
-      readonly local: string | null;
-      readonly global: string | null;
-    };
-  };
+  readonly remotes: readonly GitRepoSettingsRemote[];
 }
 
 export type GitRepoConfigBranches = { [branchName: string]: GitRepoConfigBranch };
@@ -125,65 +113,6 @@ export interface GitTagDetails {
   readonly taggerEmail: string;
   readonly taggerDate: number;
   readonly message: string;
-}
-
-/* Extension Settings Types */
-
-export enum BooleanOverride {
-  Default,
-  Enabled,
-  Disabled,
-}
-
-export enum CommitDetailsViewLocation {
-  Inline,
-  DockedToBottom,
-}
-
-export enum CommitOrdering {
-  Date = 'date',
-  AuthorDate = 'author-date',
-  Topological = 'topo',
-}
-
-export interface DateFormat {
-  readonly type: DateFormatType;
-  readonly iso: boolean;
-}
-
-export enum DateFormatType {
-  DateAndTime,
-  DateOnly,
-  Relative,
-}
-
-export enum FileViewType {
-  Default,
-  Tree,
-  List,
-}
-
-export enum GraphUncommittedChangesStyle {
-  OpenCircleAtTheUncommittedChanges,
-  OpenCircleAtTheCheckedOutCommit,
-}
-
-export enum RefLabelAlignment {
-  Normal,
-  BranchesOnLeftAndTagsOnRight,
-  BranchesAlignedToGraphAndTagsOnRight,
-}
-
-export enum RepoCommitOrdering {
-  Default = 'default',
-  Date = 'date',
-  AuthorDate = 'author-date',
-  Topological = 'topo',
-}
-
-export enum TagType {
-  Annotated,
-  Lightweight,
 }
 
 /* Base Interfaces for Request / Response Messages */
