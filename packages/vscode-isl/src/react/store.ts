@@ -1,4 +1,4 @@
-import type { GitCommitData } from '@forked/git-graph/git-data-source';
+import type { GitCommitData } from 'lib-git/git-data-source';
 import { Store, createStore } from 'redux';
 
 import type { ExtensionToWebviewMessage } from '../message-types';

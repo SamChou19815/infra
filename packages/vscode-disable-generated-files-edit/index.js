@@ -25,7 +25,6 @@ const updateGeneratedHoverForEditor = (/** @type {vscode.TextEditor | undefined}
   }
 };
 
-// eslint-disable-next-line import/prefer-default-export
 module.exports.activate = (/** @type {vscode.ExtensionContext} */ context) => {
   context.subscriptions.push(
     vscode.window.onDidChangeActiveTextEditor((editor) => updateGeneratedHoverForEditor(editor)),
