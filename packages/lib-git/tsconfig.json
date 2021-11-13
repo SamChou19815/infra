@@ -1,1 +1,13 @@
-{ "extends": "../../configurations/tsconfig.base.json" }
+{
+  "compilerOptions": {
+    "declaration": true,
+    "lib": ["es6"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "strict": true,
+    "target": "es6",
+    "types": ["node"]
+  }
+}

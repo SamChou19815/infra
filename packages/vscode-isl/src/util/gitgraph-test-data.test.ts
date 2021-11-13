@@ -1,4 +1,4 @@
-import GitDataSource from '@forked/git-graph/git-data-source';
+import GitDataSource from 'lib-git/git-data-source';
 
 import GITGRAPH_TEST_DATA from './gitgraph-test-data';
 import withPlayGround from './with-playground';

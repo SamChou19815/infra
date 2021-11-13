@@ -1,3 +1,5 @@
+// Adopted from https://github.com/mhutchie/vscode-git-graph and heavily modified.
+
 /* eslint-disable no-shadow */
 /* Git Interfaces / Types */
 

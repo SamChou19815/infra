@@ -1,4 +1,4 @@
-import type { GitCommitData } from '@forked/git-graph/git-data-source';
+import type { GitCommitData } from 'lib-git/git-data-source';
 
 export type ExtensionToWebviewMessage = {
   readonly type: 'git-commit-data';

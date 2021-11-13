@@ -6,6 +6,8 @@ import App from './App';
 import { globalReduxStore } from './store';
 import { sendMessageToExtension, startMessageListener } from './webview-messages';
 
+import './index.css';
+
 startMessageListener();
 render(
   <Provider store={globalReduxStore}>

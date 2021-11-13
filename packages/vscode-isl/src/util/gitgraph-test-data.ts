@@ -1,4 +1,4 @@
-import type { GitCommitData } from '@forked/git-graph/git-data-source';
+import type { GitCommitData } from 'lib-git/git-data-source';
 
 const GITGRAPH_TEST_DATA: GitCommitData = {
   commits: [

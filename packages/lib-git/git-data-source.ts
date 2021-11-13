@@ -1,3 +1,5 @@
+// Adopted from https://github.com/mhutchie/vscode-git-graph and heavily modified.
+
 import {
   DeepWriteable,
   ErrorInfo,
