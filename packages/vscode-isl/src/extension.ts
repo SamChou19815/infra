@@ -28,30 +28,7 @@ export function activate(context: vscode.ExtensionContext): void {
         );
         const webview = currentPanel.webview;
         webview.html = await getWebviewHTML();
-
-        const sendMessage = (message: ExtensionToWebviewMessage) => webview.postMessage(message);
-
-        webview.onDidReceiveMessage(
-          async (message: WebviewToExtensionMessage) => {
-            switch (message.type) {
-              case 'fetch-git': {
-                const source = new GitDataSource(getRepoRoots()[0]);
-                const info = await source.getRepoInfo([]);
-                const gitCommitData = await source.getCommits(
-                  null,
-                  100,
-                  info.remotes,
-                  [],
-                  info.stashes
-                );
-                await sendMessage({ type: 'git-commit-data', gitCommitData });
-                return;
-              }
-            }
-          },
-          undefined,
-          context.subscriptions
-        );
+        registerWebviewHandlers(context, webview);
 
         // Reset when the current panel is closed
         currentPanel.onDidDispose(
@@ -67,6 +44,35 @@ export function activate(context: vscode.ExtensionContext): void {
 }
 
 export function deactivate(): void {}
+
+function registerWebviewHandlers(context: vscode.ExtensionContext, webview: vscode.Webview) {
+  const sendMessage = (message: ExtensionToWebviewMessage) => webview.postMessage(message);
+
+  webview.onDidReceiveMessage(
+    async (message: WebviewToExtensionMessage) => {
+      switch (message.type) {
+        case 'reload-html':
+          webview.html = await getWebviewHTML();
+          return;
+        case 'fetch-git': {
+          const source = new GitDataSource(getRepoRoots()[0]);
+          const info = await source.getRepoInfo([]);
+          const gitCommitData = await source.getCommits(
+            info.branches.filter((it) => !it.startsWith('remotes')),
+            100,
+            [],
+            [],
+            info.stashes
+          );
+          await sendMessage({ type: 'git-commit-data', gitCommitData });
+          return;
+        }
+      }
+    },
+    undefined,
+    context.subscriptions
+  );
+}
 
 function getRepoRoots(): readonly string[] {
   return (vscode.workspace.workspaceFolders || []).map((it) => it.uri.fsPath);
