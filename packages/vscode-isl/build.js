@@ -1,7 +1,30 @@
+/* eslint-disable no-console */
+
 const { pnpPlugin } = require('@yarnpkg/esbuild-plugin-pnp');
 const { build } = require('esbuild');
 
-async function main() {
+async function watchBuildWeb() {
+  await build({
+    entryPoints: ['src/react/index.tsx'],
+    bundle: true,
+    outdir: 'build',
+    platform: 'browser',
+    target: 'es2019',
+    format: 'iife',
+    plugins: [pnpPlugin()],
+    watch: {
+      onRebuild(error) {
+        if (error) {
+          console.error('watch build failed:', error);
+        } else {
+          process.stderr.write(`\rRebuild succeeded at ${new Date().toLocaleString()}.`);
+        }
+      },
+    },
+  });
+}
+
+async function buildBoth() {
   const start = new Date().getTime();
 
   const webBuildPromise = build({
@@ -26,8 +49,7 @@ async function main() {
   });
 
   await Promise.all([webBuildPromise, extensionBuildPromise]);
-  // eslint-disable-next-line no-console
   console.error(`Bundle finished in ${new Date().getTime() - start}ms.`);
 }
 
-main();
+process.argv.includes('--watch-web') ? watchBuildWeb() : buildBoth();

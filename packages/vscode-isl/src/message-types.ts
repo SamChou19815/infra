@@ -4,4 +4,6 @@ export type ExtensionToWebviewMessage = {
   readonly type: 'git-commit-data';
   readonly gitCommitData: GitCommitData;
 };
-export type WebviewToExtensionMessage = { readonly type: 'fetch-git' };
+export type WebviewToExtensionMessage =
+  | { readonly type: 'reload-html' }
+  | { readonly type: 'fetch-git' };

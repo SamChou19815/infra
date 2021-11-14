@@ -1,5 +1,19 @@
-body {
-  background-color: #f7f7f7;
+.controller-bar {
+  margin-bottom: 1em;
+  padding: 1em;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.75);
+}
+
+.controller-bar button.control-button {
+  color: #fff;
+  cursor: pointer;
+  background-color: var(--vscode-badge-background);
+  margin: 4px;
+  padding: 4px;
+  border: none;
+}
+.controller-bar button.control-button:hover {
+  opacity: 0.8;
 }
 
 .resize-column {
@@ -24,7 +38,9 @@ body {
 }
 
 .commit-entry {
+  cursor: pointer;
   padding-left: var(--svg-width);
+  border-top: 1px solid rgba(128, 128, 128, 0.15);
 }
 .commit-entry span.commit-description {
   display: flex;
@@ -40,7 +56,8 @@ body {
 .commit-entry span.commit-description .git-ref-tag {
   flex-shrink: 0;
 }
-.commit-entry:hover {
+.commit-entry:hover,
+.commit-entry.selected {
   background-color: rgba(128, 128, 128, 0.15);
 }
 

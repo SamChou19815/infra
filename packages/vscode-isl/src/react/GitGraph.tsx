@@ -1,3 +1,4 @@
+import type { GitCommitData } from 'lib-git/git-data-source';
 import React from 'react';
 import { useSelector } from 'react-redux';
 
@@ -6,25 +7,22 @@ import getRelativeTimeDiffString from '../util/relative-time';
 import { GitRefIcon } from './Icons';
 import type { GlobalState } from './store';
 
-const COLUMN_SIZE = 20;
-const ROW_HEIGHT = 54;
+const COLUMN_SIZE = 30;
+const ROW_HEIGHT = 55;
 
 const dotCoordinate = (order: number, column: number) => ({
-  x: COLUMN_SIZE * (column + 1),
+  x: COLUMN_SIZE * (column + 0.5),
   y: (order + 0.5) * ROW_HEIGHT,
 });
 
-export default function GitGraph(): JSX.Element | null {
-  const gitCommitData = useSelector((state: GlobalState) => state.gitCommitData);
-  if (gitCommitData == null) return null;
-
+function GitGraphView({ gitCommitData }: { readonly gitCommitData: GitCommitData }): JSX.Element {
   const commits = gitGraphSlotAssignment(gitCommitData.commits);
   const hashToCoordinateMap = Object.fromEntries(
     commits.map((it, order) => [it.hash, dotCoordinate(order, it.columnId)])
   );
   const numberOfColumns = commits.reduce((acc, c) => Math.max(acc, c.columnId), -1) + 1;
 
-  const svgWidth = (numberOfColumns + 1) * COLUMN_SIZE;
+  const svgWidth = (numberOfColumns + 0.5) * COLUMN_SIZE;
   const svgHeight = 31 + commits.length * ROW_HEIGHT;
   const paths = commits.flatMap((commit) => {
     const origin = hashToCoordinateMap[commit.hash];
@@ -107,4 +105,10 @@ export default function GitGraph(): JSX.Element | null {
       </div>
     </div>
   );
+}
+
+export default function GitGraph(): JSX.Element | null {
+  const gitCommitData = useSelector((state: GlobalState) => state.gitCommitData);
+  if (gitCommitData == null) return null;
+  return <GitGraphView gitCommitData={gitCommitData} />;
 }
