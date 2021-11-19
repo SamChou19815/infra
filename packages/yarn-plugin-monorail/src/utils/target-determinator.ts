@@ -1,5 +1,4 @@
-import startAsyncProcess from 'lib-base/shell';
-
+import startAsyncProcess from './shell';
 import {
   NamedYarnInvididualWorkspaceInformation,
   YarnWorkspacesJson,

@@ -1,8 +1,7 @@
 /* eslint-disable no-console */
 
-import { GREEN, BLUE, MAGENTA, CYAN, asyncTaskWithSpinner } from 'lib-base/console';
-import startAsyncProcess from 'lib-base/shell';
-
+import { GREEN, BLUE, MAGENTA, CYAN, asyncTaskWithSpinner } from './console';
+import startAsyncProcess from './shell';
 import workspacesTargetDeterminator from './target-determinator';
 
 export default async function incrementalTask(commandName: string): Promise<boolean> {
