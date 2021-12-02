@@ -41,7 +41,7 @@ ${stdout}\n`
     .join('');
 
   if (failedWorkspacesRuns.length === 0) {
-    console.error(GREEN(`[✓] All commands have finished successfully.`));
+    console.error(GREEN(`[✓] \`${commandName}\` finished.`));
     return true;
   }
   console.error(MAGENTA('[!] Some commands finished with errors.'));
