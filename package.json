@@ -7,19 +7,19 @@
     "lint": "eslint . --cache",
     "format": "prettier --write '**/*.{ts,js,yml}'",
     "format:check": "prettier --check '**/*.{ts,js,yml}'",
-    "bump": "yarn up @types/node prettier husky typescript lint-staged esbuild eslint \"@typescript-eslint/*\" \"eslint-*\"",
+    "bump": "yarn up @types/node prettier typescript esbuild eslint \"@typescript-eslint/*\" \"eslint-*\"",
     "import-plugin": "yarn plugin import ./packages/yarn-plugin-monorail/bundles/plugin-monorail.js",
     "setup-plugin": "yarn workspace yarn-plugin-monorail bundle && yarn import-plugin && yarn"
   },
   "devDependencies": {
     "@dev-sam/eslint-config-common": "workspace:*",
-    "@types/node": "^16.11.9",
-    "@typescript-eslint/eslint-plugin": "^5.4.0",
-    "@typescript-eslint/parser": "^5.4.0",
-    "eslint": "^8.2.0",
+    "@types/node": "^16.11.11",
+    "@typescript-eslint/eslint-plugin": "^5.5.0",
+    "@typescript-eslint/parser": "^5.5.0",
+    "eslint": "^8.3.0",
     "eslint-import-resolver-node": "^0.3.6",
     "eslint-plugin-import": "^2.25.3",
-    "prettier": "^2.4.1",
+    "prettier": "^2.5.0",
     "typescript": "^4.5.2"
   },
   "eslintConfig": {
@@ -35,5 +35,5 @@
       "yarn prettier --write"
     ]
   },
-  "packageManager": "yarn@3.2.0-rc.4"
+  "packageManager": "yarn@3.2.0-rc.6"
 }

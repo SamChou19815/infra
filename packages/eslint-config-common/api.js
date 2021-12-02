@@ -13,12 +13,13 @@ const jsxA11Y = conditionalResolve('eslint-plugin-jsx-a11y');
 const react = conditionalResolve('eslint-plugin-react');
 const reactHooks = conditionalResolve('eslint-plugin-react-hooks');
 
+/** @returns {import('eslint').Linter.Config} */
 module.exports = (
   /** @type {string} */ resolvedTypescriptESLintParserModulePath,
   /** @type {string} */ resolvedESlintImportResolverNodeModulePath
 ) => ({
   env: { browser: true, node: true, jest: true },
-  globals: { Deno: 'readonly' },
+  globals: {},
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
@@ -26,7 +27,11 @@ module.exports = (
   ],
   reportUnusedDisableDirectives: true,
   parser: resolvedTypescriptESLintParserModulePath,
-  plugins: ['@typescript-eslint', 'import', ...[jsxA11Y, react, reactHooks].filter(Boolean)],
+  plugins: [
+    '@typescript-eslint',
+    'import',
+    ...[jsxA11Y, react, reactHooks].filter(/** @return {it is string} */ (it) => it != null),
+  ],
   rules: {
     '@typescript-eslint/ban-ts-comment': ['error', { 'ts-expect-error': 'allow-with-description' }],
     '@typescript-eslint/no-empty-function': 'off',

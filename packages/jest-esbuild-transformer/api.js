@@ -40,9 +40,7 @@ const loaders = {
 
 const target = `node${process.version.slice(1)}`;
 
-/**
- * @param {string} filename
- */
+/** @param {string} filename */
 const supports = (filename) => {
   if (filename.includes('node_modules')) return false;
   return extname(filename) in loaders;

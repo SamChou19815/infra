@@ -22,17 +22,19 @@ export async function asyncTaskWithSpinner<T>(
 
   let iteration = 0;
   const startTime = new Date().getTime();
+  let previousMessageLength = 0;
   const interval = setInterval(
     () => {
       const passedTime = `${((new Date().getTime() - startTime) / 1000).toFixed(1)}s`;
-      const message = getMessage(passedTime);
-      const frame = spinner[iteration % 10];
-      process.stderr.write(YELLOW(`${message} ${frame}\r`));
+      const message = YELLOW(`${getMessage(passedTime)} ${spinner[iteration % 10]}`);
+      process.stderr.write(`${' '.repeat(previousMessageLength)}\r${message}\r`);
       iteration += 1;
+      previousMessageLength = message.length;
     },
     process.stderr.isTTY ? 40 : 1000
   );
   const result = await asyncTask();
+  process.stderr.write(`${' '.repeat(previousMessageLength)}\r`);
   clearInterval(interval);
   return result;
 }
