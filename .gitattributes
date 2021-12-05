@@ -1,6 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
-packages/esbuild-scripts/api.js linguist-generated=true
-.yarn/plugins/** linguist-generated=true
-.yarn/releases/** linguist-generated=true
-.yarn/sdks/** linguist-generated=true
+.yarn/plugins/** linguist-vendored=true
+.yarn/releases/** linguist-vendored=true
+.yarn/sdks/** linguist-vendored=true

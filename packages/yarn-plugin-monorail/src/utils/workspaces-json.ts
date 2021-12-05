@@ -1,6 +1,5 @@
-import { readFile } from 'fs/promises';
-
 import type { Locator, Project } from '@yarnpkg/core';
+import { readFile } from 'fs/promises';
 
 export interface YarnInvididualWorkspaceInformation {
   readonly workspaceLocation: string;
