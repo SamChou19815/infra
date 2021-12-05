@@ -1,8 +1,8 @@
 import startAsyncProcess from './shell';
 import {
   NamedYarnInvididualWorkspaceInformation,
-  YarnWorkspacesJson,
   readGeneratedYarnWorkspacesJson,
+  YarnWorkspacesJson,
 } from './workspaces-json';
 
 async function queryChangedFilesSince(pathPrefix: string): Promise<readonly string[]> {

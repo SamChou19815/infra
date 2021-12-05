@@ -1,10 +1,8 @@
 /* eslint-disable class-methods-use-this */
 
-import { writeFileSync } from 'fs';
-
 import type { CommandContext, Hooks, Plugin } from '@yarnpkg/core';
 import { Command } from 'clipanion';
-
+import { writeFileSync } from 'fs';
 import incrementalTask from './utils/incremental';
 import workspacesTargetDeterminator from './utils/target-determinator';
 import {

@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-import { GREEN, BLUE, MAGENTA, CYAN, asyncTaskWithSpinner } from './console';
+import { asyncTaskWithSpinner, BLUE, CYAN, GREEN, MAGENTA } from './console';
 import startAsyncProcess from './shell';
 import workspacesTargetDeterminator from './target-determinator';
 
