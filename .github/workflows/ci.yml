@@ -25,4 +25,4 @@ jobs:
       - name: Lint
         run: pnpm lint
       - name: Compile
-        run: pnpm build:ci
+        run: pnpm run compile --filter "...[HEAD^]"
