@@ -7,8 +7,9 @@
     "lint": "eslint . --cache",
     "format": "prettier --write '**/*.{ts,js,yml}'",
     "format:check": "prettier --check '**/*.{ts,js,yml}'",
-    "bump": "pnpm up @types/node prettier typescript esbuild eslint \"@typescript-eslint/*\" \"eslint-*\"",
-    "compile": "pnpm compile --filter \"...[origin/main]\""
+    "build": "pnpm run compile --filter \"...[origin/main]\"",
+    "build:ci": "pnpm run compile --filter \"...[HEAD^]\"",
+    "bump": "pnpm up @types/node prettier typescript esbuild eslint \"@typescript-eslint/*\" \"eslint-*\""
   },
   "devDependencies": {
     "@dev-sam/eslint-config-common": "workspace:0.23.0",

@@ -25,4 +25,4 @@ jobs:
       - name: Lint
         run: pnpm lint
       - name: Compile
-        run: pnpm compile
+        run: pnpm build:ci
