@@ -13,17 +13,8 @@ build
 workspaces.json
 bundles
 
-## Yarn
-.yarn/*
-!.yarn/releases
-!.yarn/plugins
-!.yarn/sdks
-!.yarn/versions
+## Node
 **/node_modules
-**/.pnp
-**/.pnp.js
-**/.pnp.cjs
-**/.pnp.loader.mjs
 
 ## Cache
 .eslintcache
