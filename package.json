@@ -9,7 +9,7 @@
     "format:check": "prettier --check '**/*.{ts,js,yml}'",
     "build": "pnpm run compile --filter \"...[origin/main]\"",
     "build:ci": "pnpm run compile --filter \"...[HEAD^]\"",
-    "bump": "pnpm up @types/node prettier typescript esbuild eslint \"@typescript-eslint/*\" \"eslint-*\""
+    "bump": "pnpm up -r @types/node prettier typescript esbuild eslint \"@typescript-eslint/*\" \"eslint-*\""
   },
   "devDependencies": {
     "@dev-sam/eslint-config-common": "workspace:0.23.0",
@@ -17,10 +17,7 @@
     "@typescript-eslint/eslint-plugin": "^5.8.1",
     "@typescript-eslint/parser": "^5.8.1",
     "eslint": "^8.6.0",
-    "eslint-import-resolver-node": "^0.3.6",
-    "eslint-plugin-import": "^2.25.3",
     "prettier": "^2.5.1",
-    "prettier-plugin-organize-imports": "^2.3.4",
     "typescript": "^4.5.4"
   },
   "eslintConfig": {
@@ -29,10 +26,7 @@
   "prettier": {
     "printWidth": 100,
     "singleQuote": true,
-    "endOfLine": "lf",
-    "pluginSearchDirs": [
-      "."
-    ]
+    "endOfLine": "lf"
   },
   "lint-staged": {
     "**/*.{ts,yml}": [

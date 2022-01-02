@@ -19,6 +19,3 @@ bundles
 ## Cache
 .eslintcache
 tsconfig.tsbuildinfo
-
-## Converage
-coverage
