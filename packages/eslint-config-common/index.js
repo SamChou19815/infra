@@ -30,7 +30,7 @@ module.exports = {
   rules: {
     '@typescript-eslint/ban-ts-comment': ['error', { 'ts-expect-error': 'allow-with-description' }],
     '@typescript-eslint/no-empty-function': 'off',
-    '@typescript-eslint/no-require-imports': 'error',
+    '@typescript-eslint/no-require-imports': 'off',
     '@typescript-eslint/no-unused-vars': [
       'error',
       { args: 'after-used', ignoreRestSiblings: true, vars: 'all', varsIgnorePattern: '_' },
@@ -89,7 +89,6 @@ module.exports = {
     {
       files: ['*.js'],
       rules: {
-        '@typescript-eslint/no-require-imports': 'off',
         '@typescript-eslint/no-var-requires': 'off',
       },
     },
