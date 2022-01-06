@@ -15,9 +15,7 @@ runs:
     - name: Fetch additional history for diff
       if: ${{ inputs.historyForDiff }}
       shell: bash
-      run: |
-        git fetch origin main ${{ github.event.pull_request.base.sha }}
-        git diff ${{ github.event.pull_request.base.sha }} ${{ github.sha }}
+      run: git fetch origin main ${{ github.event.pull_request.base.sha }}
 
     - name: Cache pnpm modules
       uses: actions/cache@v2
