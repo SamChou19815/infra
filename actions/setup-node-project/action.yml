@@ -16,7 +16,8 @@ runs:
       if: ${{ inputs.historyForDiff }}
       shell: bash
       run: |
-        git fetch origin --depth=1 ${{ github.event.pull_request.base.sha }}
+        git fetch origin --depth=1 \
+          ${{ github.event.pull_request.base.sha }}:refs/remotes/BASE_BRANCH
         git checkout --progress --force refs/remotes/pull/${{ github.event.pull_request.number }}/merge
 
     - name: Cache pnpm modules
