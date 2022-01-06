@@ -9,7 +9,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - uses: ./actions/setup-node-project
+        with:
+          historyForDiff: true
       - name: Format Check
         run: pnpm format:check
       - name: Lint
