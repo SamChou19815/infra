@@ -18,4 +18,4 @@ jobs:
       - name: Lint
         run: pnpm lint
       - name: Compile
-        run: pnpm compile -- --since=remotes/BASE_BRANCH
+        run: pnpm compile -- --since=BASE_BRANCH
