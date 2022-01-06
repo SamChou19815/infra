@@ -1,0 +1,36 @@
+name: 'Setup Node Project'
+description: "Setup a Node Project with Developer Sam's Usual Config"
+
+inputs:
+  historyForDiff:
+    description: 'Whether to include additional history for diffing'
+    required: false
+    default: ''
+
+runs:
+  using: 'composite'
+  steps:
+    - uses: actions/checkout@v2
+
+    - name: Fetch additional history for diff
+      if: ${{ inputs.historyForDiff }}
+      shell: bash
+      run: git fetch origin main ${{ github.event.pull_request.base.sha }}
+
+    - name: Cache pnpm modules
+      uses: actions/cache@v2
+      with:
+        path: ~/.pnpm-store
+        key: pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          pnpm-store-
+
+    - uses: pnpm/action-setup@v2.0.1
+      with:
+        version: latest
+        run_install: |
+          - args: [--frozen-lockfile]
+
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '16'
