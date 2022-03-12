@@ -13,12 +13,12 @@
   },
   "devDependencies": {
     "@dev-sam/eslint-config-common": "workspace:0.23.0",
-    "@types/node": "^16.11.17",
-    "@typescript-eslint/eslint-plugin": "^5.8.1",
-    "@typescript-eslint/parser": "^5.8.1",
-    "eslint": "^8.6.0",
+    "@types/node": "^16.11.26",
+    "@typescript-eslint/eslint-plugin": "^5.14.0",
+    "@typescript-eslint/parser": "^5.14.0",
+    "eslint": "^8.11.0",
     "prettier": "^2.5.1",
-    "typescript": "^4.5.4"
+    "typescript": "^4.6.2"
   },
   "eslintConfig": {
     "extends": "@dev-sam/common"

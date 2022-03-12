@@ -10,7 +10,7 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Fetch additional history for diff
       if: ${{ inputs.historyForDiff }}
@@ -31,6 +31,6 @@ runs:
         run_install: |
           - args: [--frozen-lockfile]
 
-    - uses: actions/setup-node@v2
+    - uses: actions/setup-node@v3
       with:
         node-version: '16'
