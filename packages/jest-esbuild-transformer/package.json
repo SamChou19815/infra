@@ -17,6 +17,6 @@
     "esbuild": "*"
   },
   "devDependencies": {
-    "esbuild": "^0.14.10"
+    "esbuild": "^0.14.25"
   }
 }
